@@ -2,16 +2,19 @@ import math
 import circle
 
 # check collision between two moving circles python
-def check_circles_collision(x1, y1, r1, x2, y2, r2, vx1, vy1, vx2, vy2):
+def check_circles_collision(c1, c2):    
+    
+    (vx1, vy1) = c1.get_velocity_vector()
+    (vx2, vy2) = c2.get_velocity_vector()
 
     # calculate the distance between two circles
-    distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+    distance = math.sqrt((c2.x - c1.x) ** 2 + (c2.y - c1.y) ** 2)
 
     # check if the distance is less than the sum of the radii
-    if distance < r1 + r2:
+    if distance < c1.radius + c2.radius:
 
         # calculate the vector that connects the two circles
-        collision_vector = [x2 - x1, y2 - y1]
+        collision_vector = [c2.x - c1.x, c2.y - c1.y]
 
         # normalize the vector
         length = math.sqrt(collision_vector[0] ** 2 + collision_vector[1] ** 2)
@@ -19,19 +22,15 @@ def check_circles_collision(x1, y1, r1, x2, y2, r2, vx1, vy1, vx2, vy2):
         collision_vector[1] /= length
 
         # calculate the overlap distance
-        overlap = (r1 + r2) - distance
+        overlap = (c1.radius + c2.radius) - distance
 
         # use the vector to calculate the new position of the first circle
-        x1 -= collision_vector[0] * overlap
-        y1 -= collision_vector[1] * overlap
+        c1.x -= collision_vector[0] * overlap
+        c1.y -= collision_vector[1] * overlap
 
         # and the second circle
-        x2 += collision_vector[0] * overlap
-        y2 += collision_vector[1] * overlap
-
-        # calculate the new velocities of the two circles ...
-
-
+        c2.x += collision_vector[0] * overlap
+        c2.y += collision_vector[1] * overlap
 
         # calculate the perpendicular vector
         perpendicular_vector = [collision_vector[1], -collision_vector[0]]
@@ -67,7 +66,7 @@ def check_circles_collision(x1, y1, r1, x2, y2, r2, vx1, vy1, vx2, vy2):
         # vx2 = v2 * math.cos(new_angle2)
         # vy2 = v2 * math.sin(new_angle2)
 
-    return x1, y1, x2, y2, vx1, vy1, vx2, vy2
+    return c1.x, c1.y, c2.x, c2.y, vx1, vy1, vx2, vy2
 
 
 # test and simulate collision between a moving circle and field limits
@@ -93,6 +92,19 @@ def simulate_field_collision(circle, field):
     
     circle.update_velocity(velocity)
 
+def simulate_players_collision(circle, players):
+    for p2 in players:
+        circle1 = circle
+        circle2 = p2.circle
+        if circle2 != circle1:
+            x1, y1, x2, y2, vx1, vy1, vx2, vy2 = check_circles_collision(circle1, circle2)
+            circle1.x = x1
+            circle1.y = y1
+            circle1.update_velocity((vx1, vy1))
+            circle2.x = x2
+            circle2.y = y2
+            circle2.update_velocity((vx2, vy2))
+
 # calculate vx and vy based on the direction and speed
 def calculate_circle_velocity_vector(circle):
     vx = circle.speed * math.cos(circle.direction)
@@ -112,29 +124,4 @@ def move_circle(circle, field, players, delta_time):
     circle.update(delta_time)
 
     simulate_field_collision(circle, field)
-
-    for p2 in players:
-        circle1 = circle
-        circle2 = p2.circle
-        if circle2 != circle1:
-            (vx1, vy1) = circle1.get_velocity_vector()
-            (vx2, vy2) = circle2.get_velocity_vector()
-            x1, y1, x2, y2, vx1, vy1, vx2, vy2 = check_circles_collision(
-                circle1.x,
-                circle1.y,
-                circle1.radius,
-                circle2.x,
-                circle2.y,
-                circle2.radius,
-                vx1,
-                vy1,
-                vx2,
-                vy2,
-            )
-            circle1.x = x1
-            circle1.y = y1
-            circle1.update_velocity((vx1, vy1))
-            circle2.x = x2
-            circle2.y = y2
-            circle2.update_velocity((vx2, vy2))
-
+    simulate_players_collision(circle, players)
