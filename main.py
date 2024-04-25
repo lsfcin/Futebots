@@ -1,39 +1,48 @@
 import cv2
 import map
 import time
+import random
+import circle
 import player
 import painter
 import physics
 import numpy as np
 
 # globals
-map = map.Map(800, 600, 50, 250)
-
 start = time.time()
 end = time.time()
-target_elapsed_time = 0.033 # 30fps
-
-i = 50
+elapsed_time = 0.033        # just initializing the variable
+target_elapsed_time = 0.033 # aiming at a target realtime fps (30fps)
 exit = False
 
-p1 = player.Player(200, 200, 1.6, 100, 1, 30, 0.1, 2, 0.1)
-p2 = player.Player(400, 200, 1.6, 150, 2, 20, 0.1, 2, 0.1)
+# create game components
+field = map.Map(800, 600, 50, 250)
+p1 = player.Player(circle.Circle(30, 200, 200, 1.6, 100, -0.1 ), 1, 0.1, 2)
+p2 = player.Player(circle.Circle(25, 100, 200, 1.9, 100,  0.1 ), 1, 0.1, 2)
+p3 = player.Player(circle.Circle(15, 200, 100, 1.0, 100,  0.01), 1, 0.1, 2)
+p4 = player.Player(circle.Circle(30, 400, 400, 0.6, 100,  0.2 ), 2, 0.1, 2)
+p5 = player.Player(circle.Circle(25, 450, 450, 0.1, 100, -0.01), 2, 0.1, 2)
+p6 = player.Player(circle.Circle(20, 400, 200, 2.6, 150,  0.05), 2, 0.1, 2)
+players = [p1, p2, p3, p4, p5, p6]
 
+# start game loop
 while not exit:
-  image = painter.create_map_image(map)
-  p1.direction = physics.change_direction(p1.direction, -0.01)  
-  p2.direction = physics.change_direction(p2.direction, 0.02)
-  physics.move_player(p1, map, target_elapsed_time)
-  physics.move_player(p2, map, target_elapsed_time)
-  painter.paint_player(image, p1)
-  painter.paint_player(image, p2)
 
-  # sleep to keep the desired frame rate and then show the frame
-  end = time.time()
-  delta = end - start
-  time.sleep(target_elapsed_time - delta)
+  # paint the game components
+  image = painter.create_field_image(field)
+  
+  for p in players:
+    physics.move_circle(p.circle, field, players, target_elapsed_time)
+    painter.paint_player(image, p)
+
   cv2.imshow('frame', image)
+  
+  # time management
+  end = time.time()
+  elapsed_time = end - start
+  time.sleep(max(0, target_elapsed_time - elapsed_time))
   start = time.time()
 
+  # capture key press
   if cv2.waitKey(1) == 27: # esc keys
     exit = True

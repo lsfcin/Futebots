@@ -5,11 +5,11 @@ import numpy as np
 background_grey = 170
 lines_gray = (240, 240, 240)
 
-def create_map_image(map):
-  height = map.height
-  width = map.width
-  margin = map.margin
-  goal_size = map.goal_size
+def create_field_image(field):
+  height = field.height
+  width = field.width
+  margin = field.margin
+  goal_size = field.goal_size
 
   image = np.ones((height + margin, width + margin, 3), dtype="uint8") * background_grey
 
@@ -55,23 +55,24 @@ def paint_player(image, player):
         head_color = (50, 100, 50)
 
     # paint the player's position
-    x = int(player.x)
-    y = int(player.y)
+    circle = player.circle
+    x = int(circle.x)
+    y = int(circle.y)
 
     cv2.circle(image, 
                (x, y), 
-               player.radius, 
+               circle.radius, 
                body_color, 
                -1)
 
     # paint the player's direction
-    direction_x = x + int(player.radius * 0.4 * math.cos(player.direction))
-    direction_y = y + int(player.radius * 0.4 * math.sin(player.direction))
+    direction_x = x + int(circle.radius * 0.4 * math.cos(circle.direction))
+    direction_y = y + int(circle.radius * 0.4 * math.sin(circle.direction))
     
     # draw a triangle based on the player's direction
     cv2.circle(image, 
              (direction_x, direction_y),
-             (int)(player.radius / 1.5),
+             (int)(circle.radius / 1.5),
              head_color, 
              -1)
 
