@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class Circle:
   def __init__(
@@ -20,7 +21,7 @@ class Circle:
   def get_velocity_vector(self):
       vx = self.directional_speed * math.cos(self.direction)
       vy = self.directional_speed * math.sin(self.direction)
-      velocity = list((vx, vy))
+      velocity = np.array((vx, vy))
       return velocity
   
   def update_position(self, elapsed_time):

@@ -66,13 +66,13 @@ def paint_player(image, player):
                -1)
 
     # paint the player's direction
-    direction_x = x + int(circle.radius * 0.4 * math.cos(circle.direction))
-    direction_y = y + int(circle.radius * 0.4 * math.sin(circle.direction))
+    direction_x = x + int(circle.radius * 0.5 * math.cos(circle.direction))
+    direction_y = y + int(circle.radius * 0.5 * math.sin(circle.direction))
     
     # draw a triangle based on the player's direction
     cv2.circle(image, 
              (direction_x, direction_y),
-             (int)(circle.radius / 1.5),
+             (int)(circle.radius / 3),
              head_color, 
              -1)
 
