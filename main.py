@@ -24,6 +24,7 @@ p4 = player.Player(circle.Circle(30, 400, 400, 0.6, 100,  0.002 ), 2, 0.1, 2)
 p5 = player.Player(circle.Circle(25, 450, 450, 0.1, 100, -0.0001), 2, 0.1, 2)
 p6 = player.Player(circle.Circle(20, 400, 200, 2.6, 150,  0.0005), 2, 0.1, 2)
 players = [p1, p2, p3, p4, p5, p6]
+ball = circle.Circle(10, int((field.margin + field.width)/2), int((field.margin + field.height)/2), 0, 0, 0)
 
 # start game loop
 while not exit:
@@ -34,6 +35,9 @@ while not exit:
   for p in players:
     physics.move_circle(p.circle, field, players, target_elapsed_time)
     painter.paint_player(image, p)
+  
+  physics.move_circle(ball, field, players, target_elapsed_time)
+  painter.paint_ball(image, ball)
 
   cv2.imshow('Futebots! Genetic algorithms for football agents.', image)
 

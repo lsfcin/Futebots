@@ -77,3 +77,19 @@ def paint_player(image, player):
              -1)
 
     return image
+
+def paint_ball(image, ball):
+   
+    cv2.circle(image, 
+              (int(ball.x), int(ball.y)), 
+              ball.radius, 
+              (245, 245, 245), 
+              -1)
+    
+    cv2.circle(image, 
+              (int(ball.x), int(ball.y)), 
+              ball.radius, 
+              (10, 10, 10), 
+              2)
+
+    return image
