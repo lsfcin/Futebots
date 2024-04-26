@@ -2,6 +2,11 @@ import math
 import numpy as np
 
 class Circle:
+
+  render_x = 0
+  render_y = 0
+  render_direction = 0
+  
   def __init__(
         self, 
         radius,            # in pixels
@@ -17,6 +22,10 @@ class Circle:
     self.directional_speed = directional_speed
     self.angular_speed = angular_speed
     self.radius = radius
+
+    self.render_x = self.x
+    self.render_y = self.y
+    self.render_direction = self.direction
       
   def get_velocity_vector(self):
       vx = self.directional_speed * math.cos(self.direction)
@@ -37,6 +46,12 @@ class Circle:
   def update(self, elapsed_time):
       self.updated_direction(elapsed_time)
       self.update_position(elapsed_time)
+
+      factor = 0.6
+
+      self.render_x = factor * self.render_x + (1 - factor) * self.x
+      self.render_y = factor * self.render_y + (1 - factor) * self.y
+      self.render_direction = factor * self.render_direction + (1 - factor) * self.direction
 
   def update_velocity(self, velocity):
       # calculate direction and speed based on velocity x and velocity y

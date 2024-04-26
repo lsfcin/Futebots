@@ -41,8 +41,6 @@ def simulate_circles_collision(c1, c2):
         r1, r2 = np.array((c1.x, c1.y)), np.array((c2.x, c2.y))
         d = np.linalg.norm(r1 - r2)**2
         v1, v2 = circle1_vel, circle2_vel
-        print("dot 1: ", np.dot(v1-v2, r1-r2))
-        print("dot 2: ", np.dot(v1-v2, r1-r2))
         u1 = v1 - 2*m2 / M * np.dot(v1-v2, r1-r2) / d * (r1 - r2)
         u2 = v2 - 2*m1 / M * np.dot(v2-v1, r2-r1) / d * (r2 - r1)
         c1.update_velocity(u1)

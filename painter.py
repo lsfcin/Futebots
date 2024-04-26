@@ -56,8 +56,8 @@ def paint_player(image, player):
 
     # paint the player's position
     circle = player.circle
-    x = int(circle.x)
-    y = int(circle.y)
+    x = int(circle.render_x)
+    y = int(circle.render_y)
 
     cv2.circle(image, 
                (x, y), 
@@ -66,8 +66,8 @@ def paint_player(image, player):
                -1)
 
     # paint the player's direction
-    direction_x = x + int(circle.radius * 0.5 * math.cos(circle.direction))
-    direction_y = y + int(circle.radius * 0.5 * math.sin(circle.direction))
+    direction_x = x + int(circle.radius * 0.5 * math.cos(circle.render_direction))
+    direction_y = y + int(circle.radius * 0.5 * math.sin(circle.render_direction))
     
     # draw a triangle based on the player's direction
     cv2.circle(image, 
