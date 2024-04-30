@@ -58,20 +58,13 @@ def create_field_image(field):
 
 def paint_player(image, player):
     
-    # speed = player.circle.get_speed()
-    # player.animation_stage = player.animation_stage + (speed * player.animation_direction)
-    
-    # if player.animation_stage > 100:
-    #     player.animation_direction = -1
-
-    # elif player.animation_stage < -100:
-    #     player.animation_direction = 1
-
-    animation_offset = -20
+    player.update_animation_stage()
+    animation_stage = player.get_animation_stage()
     
     # defining colors
     body_color = (255, 255, 255)
     head_color = (255, 255, 255)
+    feet_color = (100, 100, 100)
     if player.team == 1:
         body_color = (100, 100, 240)
         head_color = (50, 50, 100)
@@ -92,15 +85,50 @@ def paint_player(image, player):
 
     degrees = circle.render_direction * 180 / math.pi
 
-    # paint player's arms
-    arm_x = int(x + forward[0] * 0.3 + sideward[0] * 0.85)
-    arm_y = int(y + forward[1] * 0.3 + sideward[1] * 0.85)
+    # paint player's feet
+    left_foot_x  = int(x + forward[0] * (-0.03 - (animation_stage * 0.002)) + sideward[0] * (0.3))
+    left_foot_y  = int(y + forward[1] * (-0.03 - (animation_stage * 0.002)) + sideward[1] * (0.3))
+    right_foot_x = int(x + forward[0] * (-0.03 + (animation_stage * 0.002)) - sideward[0] * (0.3))
+    right_foot_y = int(y + forward[1] * (-0.03 + (animation_stage * 0.002)) - sideward[1] * (0.3))
 
     cv2.ellipse(
         image,
-        (arm_x, arm_y),
-        (int(circle.radius / 4), int(circle.radius / 2)),
-        degrees - 90 + animation_offset,
+        (left_foot_x, left_foot_y),
+        (int(circle.radius / 5), int(circle.radius / 2.5)),
+        degrees - 90,
+        0, 360,
+        feet_color,
+        -1)
+    
+    cv2.ellipse(
+        image,
+        (right_foot_x, right_foot_y),
+        (int(circle.radius / 5), int(circle.radius / 2.5)),
+        degrees - 90,
+        0, 360,
+        feet_color,
+        -1)
+
+    # paint player's arms
+    left_arm_x  = int(x + forward[0] * 0.2 + sideward[0] * (0.8 - (animation_stage * 0.0005)))
+    left_arm_y  = int(y + forward[1] * 0.2 + sideward[1] * (0.8 - (animation_stage * 0.0005)))
+    right_arm_x = int(x + forward[0] * 0.2 - sideward[0] * (0.8 + (animation_stage * 0.0005)))
+    right_arm_y = int(y + forward[1] * 0.2 - sideward[1] * (0.8 + (animation_stage * 0.0005)))
+
+    cv2.ellipse(
+        image,
+        (left_arm_x, left_arm_y),
+        (int(circle.radius / 5), int(circle.radius / 2)),
+        degrees - 110 + (animation_stage * 0.1),
+        0, 360,
+        head_color,
+        -1)
+    
+    cv2.ellipse(
+        image,
+        (right_arm_x, right_arm_y),
+        (int(circle.radius / 5), int(circle.radius / 2)),
+        degrees - 70 + (animation_stage * 0.1),
         0, 360,
         head_color,
         -1)

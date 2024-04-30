@@ -33,6 +33,9 @@ class Circle:
       velocity = np.array((vx, vy))
       return velocity
   
+  def get_speed(self):
+      return self.directional_speed
+  
   def update_position(self, elapsed_time):
       (vx, vy) = self.get_velocity_vector()
       self.x += vx * elapsed_time
