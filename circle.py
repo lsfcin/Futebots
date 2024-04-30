@@ -47,11 +47,12 @@ class Circle:
       self.updated_direction(elapsed_time)
       self.update_position(elapsed_time)
 
-      factor = 0.6
+      pos_factor = 0.6
+      dir_factor = 0.85
 
-      self.render_x = factor * self.render_x + (1 - factor) * self.x
-      self.render_y = factor * self.render_y + (1 - factor) * self.y
-      self.render_direction = factor * self.render_direction + (1 - factor) * self.direction
+      self.render_x = pos_factor * self.render_x + (1 - pos_factor) * self.x
+      self.render_y = pos_factor * self.render_y + (1 - pos_factor) * self.y
+      self.render_direction = dir_factor * self.render_direction + (1 - dir_factor) * self.direction
 
   def update_velocity(self, velocity):
       # calculate direction and speed based on velocity x and velocity y
