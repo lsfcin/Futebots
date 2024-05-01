@@ -62,17 +62,37 @@ def paint_player(image, player):
     animation_stage = player.get_animation_stage()
     
     # defining colors
-    body_color = (255, 255, 255)
-    head_color = (255, 255, 255)
-    feet_color = (100, 100, 100)
-    if player.team == 1:
-        body_color = (100, 100, 240)
-        head_color = (50, 50, 100)
-    elif player.team == 2:
-        body_color = (100, 240, 100)
-        head_color = (50, 100, 50)
+    body_color, skin_color, hair_color, feet_color = get_painting_colors(player)
 
     # defining auxiliar coordinates
+    circle, x, y, forward, sideward, angle = calc_painting_vars(player)
+
+    # paint player's feet
+    paint_feet(image, animation_stage, feet_color, circle, x, y, forward, sideward, angle)
+
+    # paint player's arms
+    paint_arms(image, animation_stage, skin_color, circle, x, y, forward, sideward, angle)
+    
+    # paint_body
+    paint_body(image, body_color, circle, x, y, angle)
+
+    # paint the player's head
+    paint_head(image, skin_color, hair_color, circle, x, y, forward, angle)
+
+    return image
+
+def get_painting_colors(player):
+    body_color = (255, 255, 255)
+    skin_color = player.skin_color
+    hair_color = player.hair_color
+    feet_color = (80, 80, 80)
+    if player.team == 1:
+        body_color = (100, 100, 240)
+    elif player.team == 2:
+        body_color = (100, 240, 100)
+    return body_color,skin_color,hair_color,feet_color
+
+def calc_painting_vars(player):
     circle = player.circle
     x = int(circle.render_x)
     y = int(circle.render_y)
@@ -84,8 +104,62 @@ def paint_player(image, player):
                         -circle.radius * math.cos(circle.render_direction)))
 
     degrees = circle.render_direction * 180 / math.pi
+    return circle,x,y,forward,sideward,degrees
 
-    # paint player's feet
+def paint_head(image, skin_color, hair_color, circle, x, y, forward, angle):
+
+    # head
+    head_x = int(x + forward[0] * 0.1)
+    head_y = int(y + forward[1] * 0.1)
+    cv2.circle(image, (head_x, head_y), int(circle.radius / 2), skin_color, -1)
+    
+    # hair
+    hair_x = int(head_x - forward[0] * 0.045)
+    hair_y = int(head_y - forward[1] * 0.045)
+    cv2.ellipse(
+        image, 
+        (hair_x, hair_y), 
+        (int(circle.radius / 2.20), 
+         int(circle.radius / 2)), 
+         angle, 0, 360, hair_color, -1)
+
+def paint_body(image, body_color, circle, x, y, degrees):
+    cv2.ellipse(
+        image,
+        (x, y),
+        (int(circle.radius / 2), circle.radius),
+        degrees,
+        0,
+        360,
+        body_color,
+        -1,
+    )
+
+def paint_arms(image, animation_stage, head_color, circle, x, y, forward, sideward, degrees):
+    left_arm_x  = int(x + forward[0] * 0.2 + sideward[0] * (0.8 - (animation_stage * 0.0005)))
+    left_arm_y  = int(y + forward[1] * 0.2 + sideward[1] * (0.8 - (animation_stage * 0.0005)))
+    right_arm_x = int(x + forward[0] * 0.2 - sideward[0] * (0.8 + (animation_stage * 0.0005)))
+    right_arm_y = int(y + forward[1] * 0.2 - sideward[1] * (0.8 + (animation_stage * 0.0005)))
+
+    cv2.ellipse(
+        image,
+        (left_arm_x, left_arm_y),
+        (int(circle.radius / 5), int(circle.radius / (2 + (max(animation_stage,0) * 0.01)))),
+        degrees - 100 + (animation_stage * 0.15),
+        0, 360,
+        head_color,
+        -1)
+    
+    cv2.ellipse(
+        image,
+        (right_arm_x, right_arm_y),
+        (int(circle.radius / 5), int(circle.radius / (2 + (max(-animation_stage,0) * 0.01)))),
+        degrees - 80 + (animation_stage * 0.15),
+        0, 360,
+        head_color,
+        -1)
+
+def paint_feet(image, animation_stage, feet_color, circle, x, y, forward, sideward, degrees):
     left_foot_x  = int(x + forward[0] * (-0.03 - (animation_stage * 0.002)) + sideward[0] * (0.3))
     left_foot_y  = int(y + forward[1] * (-0.03 - (animation_stage * 0.002)) + sideward[1] * (0.3))
     right_foot_x = int(x + forward[0] * (-0.03 + (animation_stage * 0.002)) - sideward[0] * (0.3))
@@ -109,55 +183,10 @@ def paint_player(image, player):
         feet_color,
         -1)
 
-    # paint player's arms
-    left_arm_x  = int(x + forward[0] * 0.2 + sideward[0] * (0.8 - (animation_stage * 0.0005)))
-    left_arm_y  = int(y + forward[1] * 0.2 + sideward[1] * (0.8 - (animation_stage * 0.0005)))
-    right_arm_x = int(x + forward[0] * 0.2 - sideward[0] * (0.8 + (animation_stage * 0.0005)))
-    right_arm_y = int(y + forward[1] * 0.2 - sideward[1] * (0.8 + (animation_stage * 0.0005)))
-
-    cv2.ellipse(
-        image,
-        (left_arm_x, left_arm_y),
-        (int(circle.radius / 5), int(circle.radius / 2)),
-        degrees - 110 + (animation_stage * 0.1),
-        0, 360,
-        head_color,
-        -1)
-    
-    cv2.ellipse(
-        image,
-        (right_arm_x, right_arm_y),
-        (int(circle.radius / 5), int(circle.radius / 2)),
-        degrees - 70 + (animation_stage * 0.1),
-        0, 360,
-        head_color,
-        -1)
-    
-    # draw an ellipse based on a circle and a direction
-    cv2.ellipse(
-        image,
-        (x, y),
-        (int(circle.radius / 2), circle.radius),
-        degrees,
-        0,
-        360,
-        body_color,
-        -1,
-    )
-
-    # paint the player's head
-    head_x = int(x + forward[0] * 0.1)
-    head_y = int(y + forward[1] * 0.1)
-
-    cv2.circle(image, (head_x, head_y), int(circle.radius / 2), head_color, -1)
-
-    return image
-
-
 def paint_ball(image, ball):
 
     cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (245, 245, 245), -1)
 
-    cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (10, 10, 10), 2)
+    cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (10, 10, 10), 1)
 
     return image

@@ -5,9 +5,11 @@ class Player:
     animation_stage = 0
     animation_direction = 1
 
-    def __init__(self, circle, team, acceleration, top_speed):
+    def __init__(self, circle, team, skin_color, hair_color, acceleration, top_speed):
         self.circle = circle
         self.team = team
+        self.skin_color = skin_color
+        self.hair_color = hair_color
         self.acceleration = acceleration
         self.top_speed = top_speed
 
