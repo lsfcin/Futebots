@@ -185,8 +185,10 @@ def paint_feet(image, animation_stage, feet_color, circle, x, y, forward, sidewa
 
 def paint_ball(image, ball):
 
-    cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (245, 245, 245), -1)
+    cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (140, 140, 140), -1)
+    cv2.circle(image, (int(ball.x-1), int(ball.y-1)), ball.radius-2, (200, 200, 200), -1)
+    cv2.circle(image, (int(ball.x-2), int(ball.y-2)), ball.radius-4, (245, 245, 245), -1)
 
-    cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (10, 10, 10), 1)
+    #cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (10, 10, 10), 2)
 
     return image
