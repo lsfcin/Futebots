@@ -36,6 +36,7 @@ hair_colors.append((30, 40, 45))
 hair_colors.append((60, 75, 80))
 hair_colors.append((80, 75, 60))
 hair_colors.append((10, 40, 50))
+hair_colors.append((5 , 10, 15))
 
 def sort_hair(hair_colors):
     return hair_colors[int(random.random()*len(hair_colors))]	

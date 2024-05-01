@@ -77,7 +77,7 @@ def paint_player(image, player):
     paint_body(image, body_color, circle, x, y, angle)
 
     # paint the player's head
-    paint_head(image, skin_color, hair_color, circle, x, y, forward, angle)
+    paint_head(image, animation_stage, skin_color, hair_color, circle, x, y, forward, sideward, angle)
 
     return image
 
@@ -106,11 +106,11 @@ def calc_painting_vars(player):
     degrees = circle.render_direction * 180 / math.pi
     return circle,x,y,forward,sideward,degrees
 
-def paint_head(image, skin_color, hair_color, circle, x, y, forward, angle):
+def paint_head(image, animation_stage, skin_color, hair_color, circle, x, y, forward, sideward, angle):
 
     # head
-    head_x = int(x + forward[0] * 0.1)
-    head_y = int(y + forward[1] * 0.1)
+    head_x = int(x + forward[0] * 0.1 - sideward[0] * (animation_stage * 0.0005))
+    head_y = int(y + forward[1] * 0.1 - sideward[1] * (animation_stage * 0.0005))
     cv2.circle(image, (head_x, head_y), int(circle.radius / 2), skin_color, -1)
     
     # hair
@@ -121,7 +121,7 @@ def paint_head(image, skin_color, hair_color, circle, x, y, forward, angle):
         (hair_x, hair_y), 
         (int(circle.radius / 2.20), 
          int(circle.radius / 2)), 
-         angle, 0, 360, hair_color, -1)
+         angle + (animation_stage * 0.1), 0, 360, hair_color, -1)
 
 def paint_body(image, body_color, circle, x, y, degrees):
     cv2.ellipse(
