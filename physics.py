@@ -88,18 +88,20 @@ def change_speed(current_speed, acceleration, top_speed):
     return current_speed
 
 # move player
-def move_player(circle, field, players, delta_time):
+def move_player(player, field, players, elapsed_time):
 
-    circle.update(delta_time)
+    player.update(elapsed_time)
 
-    simulate_field_collision(circle, field)
-    simulate_players_collision(circle, players)
+    simulate_field_collision(player.circle, field)
+    simulate_players_collision(player.circle, players)
 
 # move ball
-def move_ball(ball, field, players, delta_time):
+def move_ball(ball, field, players, elapsed_time):
 
     # if the ball is not with a player, move the ball
-    ball.update(delta_time)
+    friction = 50     # speed reduction in pixels per second
+    ball.speed = max(1, ball.speed - friction * elapsed_time)
+    ball.update(elapsed_time)
 
     simulate_field_collision(ball, field)
     simulate_players_with_ball(ball, players)

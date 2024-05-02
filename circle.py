@@ -9,45 +9,44 @@ class Circle:
   
   def __init__(
         self, 
-        radius,            # in pixels
-        x,                 # in pixels
-        y,                 # in pixels
-        angular_direction, # in radians
-        directional_speed, # in pixels per second
-        angular_speed):    # in radians per second
+        radius,     # in pixels
+        x,          # in pixels
+        y,          # in pixels
+        angle,      # in radians
+        ang_speed): # in radians per second
         
+    self.radius = radius
     self.x = x
     self.y = y
-    self.direction = angular_direction
-    self.directional_speed = directional_speed
-    self.angular_speed = angular_speed
-    self.radius = radius
+    self.angle = angle
+    self.speed = 0
+    self.ang_speed = ang_speed
 
     self.render_x = self.x
     self.render_y = self.y
-    self.render_direction = self.direction
+    self.render_direction = self.angle
       
   def get_velocity_vector(self):
-      vx = self.directional_speed * math.cos(self.direction)
-      vy = self.directional_speed * math.sin(self.direction)
+      vx = self.speed * math.cos(self.angle)
+      vy = self.speed * math.sin(self.angle)
       velocity = np.array((vx, vy))
       return velocity
   
   def get_speed(self):
-      return self.directional_speed
+      return self.speed
   
   def update_position(self, elapsed_time):
       (vx, vy) = self.get_velocity_vector()
       self.x += vx * elapsed_time
       self.y += vy * elapsed_time
 
-  def updated_direction(self, elapsed_time):
-      self.direction += self.angular_speed * elapsed_time
-      if self.direction > 2 * math.pi:
-          self.direction -= 2 * math.pi
+  def update_direction(self, elapsed_time):
+      self.angle += self.ang_speed * elapsed_time
+      if self.angle > 2 * math.pi:
+          self.angle -= 2 * math.pi
 
   def update(self, elapsed_time):
-      self.updated_direction(elapsed_time)
+      self.update_direction(elapsed_time)
       self.update_position(elapsed_time)
 
       pos_factor = 0.6
@@ -55,12 +54,12 @@ class Circle:
 
       self.render_x = pos_factor * self.render_x + (1 - pos_factor) * self.x
       self.render_y = pos_factor * self.render_y + (1 - pos_factor) * self.y
-      self.render_direction = dir_factor * self.render_direction + (1 - dir_factor) * self.direction
+      self.render_direction = dir_factor * self.render_direction + (1 - dir_factor) * self.angle
 
   def update_velocity(self, velocity):
       # calculate direction and speed based on velocity x and velocity y
-      self.directional_speed = math.sqrt(velocity[0]**2 + velocity[1]**2)
-      self.direction = math.atan2(velocity[1], velocity[0])
+      self.speed = math.sqrt(velocity[0]**2 + velocity[1]**2)
+      self.angle = math.atan2(velocity[1], velocity[0])
    
   def calc_vectors(self):
       forward = np.array((self.radius * math.cos(self.render_direction),

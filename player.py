@@ -4,31 +4,38 @@ import circle
 class Player:
     animation_stage = 0
     animation_direction = 1
-    possession_time = 0
+    hold_count = 0
     has_ball = False
 
     def __init__(
           self, 
           circle, 
           team, 
-          skin_color, 
-          hair_color, 
-          acceleration, 
+          skin, 
+          hair, 
+          accel, 
           top_speed,
-          top_posession_time,
+          top_hold_count,
           kick_strength):
         self.circle = circle
         self.team = team
-        self.skin_color = skin_color
-        self.hair_color = hair_color
-        self.acceleration = acceleration
+        self.skin_color = skin
+        self.hair_color = hair
+        self.accel = accel
         self.top_speed = top_speed
-        self.top_posession_time = top_posession_time
+        self.top_hold_count = top_hold_count
         self.kick_strength = kick_strength
+
+    def update(self, elapsed_time):
+        dir_speed = self.circle.speed
+        dir_speed = min(self.top_speed, dir_speed + self.accel * elapsed_time)
+        self.circle.speed = dir_speed
+        self.circle.update(elapsed_time)
+        
 
     def update_animation_stage(self):
       animation_factor = 0.3
-      self.animation_stage = self.animation_stage + animation_factor * (self.circle.directional_speed * self.animation_direction)
+      self.animation_stage = self.animation_stage + animation_factor * (self.circle.speed * self.animation_direction)
       
       if self.animation_stage > 100:
           self.animation_direction = -1
@@ -37,14 +44,14 @@ class Player:
           self.animation_direction = 1
 
       # after a kick, skip some frames to enable the player to grab the ball again
-      if(self.possession_time < 0):
-          self.possession_time += 1
+      if(self.hold_count < 0):
+          self.hold_count += 1
 
     def get_animation_stage(self):
         return self.animation_stage
     
     def manage_ball(self, ball, collided, players):
-      if(collided and self.possession_time == 0):
+      if(collided and self.hold_count == 0):
           # grab the ball
           self.has_ball = True
 
@@ -57,16 +64,16 @@ class Player:
       if(self.has_ball):
 
         # keep counting possession time
-        self.possession_time += 1
+        self.hold_count += 1
 
-        if(self.possession_time > self.top_posession_time):
+        if(self.hold_count > self.top_hold_count):
             # reset possession
-            self.possession_time = -30 # it will take N frames to grab the ball again
+            self.hold_count = -30 # it will take N frames to grab the ball again
             self.has_ball = False
             
             # kick the ball
-            ball.direction = self.circle.direction
-            ball.directional_speed = self.kick_strength
+            ball.angle = self.circle.angle
+            ball.speed = self.kick_strength
 
         else:
             # move the ball with the player
@@ -75,5 +82,5 @@ class Player:
             possession_y = int(self.circle.y + forward[1] * 0.8 - sideward[1] * (self.animation_stage * 0.004))
             ball.x = ball.x * 0.7 + possession_x * 0.3
             ball.y = ball.y * 0.7 + possession_y * 0.3
-            ball.direction = self.circle.direction
-            ball.directional_speed = 0
+            ball.angle = self.circle.angle
+            ball.speed = 0
