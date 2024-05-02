@@ -97,11 +97,7 @@ def calc_painting_vars(player):
     x = int(circle.render_x)
     y = int(circle.render_y)
     
-    forward = np.array((circle.radius * math.cos(circle.render_direction),
-                        circle.radius * math.sin(circle.render_direction)))
-    
-    sideward = np.array((circle.radius * math.sin(circle.render_direction),
-                        -circle.radius * math.cos(circle.render_direction)))
+    forward, sideward = circle.calc_vectors()
 
     degrees = circle.render_direction * 180 / math.pi
     return circle,x,y,forward,sideward,degrees
@@ -181,8 +177,8 @@ def paint_feet(image, animation_stage, feet_color, circle, x, y, forward, sidewa
         degrees - 90,
         0, 360,
         feet_color,
-        -1)
-
+        -1)    
+    
 def paint_ball(image, ball):
 
     cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (140, 140, 140), -1)

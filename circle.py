@@ -61,3 +61,12 @@ class Circle:
       # calculate direction and speed based on velocity x and velocity y
       self.directional_speed = math.sqrt(velocity[0]**2 + velocity[1]**2)
       self.direction = math.atan2(velocity[1], velocity[0])
+   
+  def calc_vectors(self):
+      forward = np.array((self.radius * math.cos(self.render_direction),
+                          self.radius * math.sin(self.render_direction)))
+      
+      sideward = np.array((self.radius * math.sin(self.render_direction),
+                          -self.radius * math.cos(self.render_direction)))
+                          
+      return forward,sideward

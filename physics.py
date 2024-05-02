@@ -2,17 +2,21 @@ import math
 import circle
 import numpy as np
 
+# check collision between two circles
+def check_collision(c1, c2, r1_factor=1.0):
+    distance = math.sqrt((c2.x - c1.x) ** 2 + (c2.y - c1.y) ** 2)
+    collided = distance < c1.radius * r1_factor + c2.radius
+    return collided, distance
+
 # check collision between two moving circles python
 def simulate_circles_collision(c1, c2):    
     
     circle1_vel = c1.get_velocity_vector()
     circle2_vel = c2.get_velocity_vector()
 
-    # calculate the distance between two circles
-    distance = math.sqrt((c2.x - c1.x) ** 2 + (c2.y - c1.y) ** 2)
-
-    # check if the distance is less than the sum of the radii
-    if distance < c1.radius + c2.radius:
+    # if there is a collision, simulate
+    collided, distance = check_collision(c1, c2)
+    if collided:
 
         # calculate the vector that connects the two circles
         collision_v = np.array((c2.x - c1.x, c2.y - c1.y))
@@ -83,10 +87,25 @@ def change_speed(current_speed, acceleration, top_speed):
         current_speed = top_speed
     return current_speed
 
-# move Circle
-def move_circle(circle, field, players, delta_time):
+# move player
+def move_player(circle, field, players, delta_time):
 
     circle.update(delta_time)
 
     simulate_field_collision(circle, field)
     simulate_players_collision(circle, players)
+
+# move ball
+def move_ball(ball, field, players, delta_time):
+
+    # if the ball is not with a player, move the ball
+    ball.update(delta_time)
+
+    simulate_field_collision(ball, field)
+    simulate_players_with_ball(ball, players)
+
+def simulate_players_with_ball(ball, players):
+    # if a player has the ball, move the ball with the player
+    for p in players:
+        collided = check_collision(ball, p.circle)[0]
+        p.manage_ball(ball, collided, players)
