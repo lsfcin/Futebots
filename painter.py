@@ -198,3 +198,14 @@ def paint_ball(image, ball):
     #cv2.circle(image, (int(ball.x), int(ball.y)), ball.radius, (10, 10, 10), 2)
 
     return image
+
+def paint_score(image, goals1, goals2, field):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1
+    font_color = (240, 240, 240)
+    line_type = 4
+    text = str(goals1) + " x " + str(goals2)
+
+    cv2.putText(image, text, (field.margin, int(field.margin/2)), font, font_scale, font_color, line_type)
+
+    return image

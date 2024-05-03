@@ -74,6 +74,7 @@ def simulate_player_field_collision(circle, field):
     circle.update_velocity(velocity)
 
 def simulate_ball_field_collision(ball, field):
+    goal = 0
     velocity = ball.get_velocity_vector()
 
     # check if the circle is going to collide with the top wall
@@ -98,6 +99,7 @@ def simulate_ball_field_collision(ball, field):
             if ball.x + ball.radius < field.margin:
                 velocity[0] = 0
                 velocity[1] = 0
+                goal = -1
         else:
           ball.x = ball.radius + field.margin
           velocity[0] = -velocity[0]
@@ -114,12 +116,14 @@ def simulate_ball_field_collision(ball, field):
             if ball.x - ball.radius > field.width:
                 velocity[0] = 0
                 velocity[1] = 0
+                goal = 1
 
         else:
           ball.x = field.width - ball.radius
           velocity[0] = -velocity[0]
     
     ball.update_velocity(velocity)
+    return goal
 
 def simulate_player_players_collision(circle, players):
     for p2 in players:
@@ -151,8 +155,10 @@ def move_ball(ball, field, players, elapsed_time):
     ball.speed = max(0, ball.speed - friction * elapsed_time)
     ball.update(elapsed_time)
 
-    simulate_ball_field_collision(ball, field)
     simulate_players_with_ball(ball, players)
+    goal = simulate_ball_field_collision(ball, field)
+
+    return goal
 
 def simulate_players_with_ball(ball, players):
     # if a player has the ball, move the ball with the player
