@@ -199,12 +199,16 @@ def paint_ball(image, ball):
 
     return image
 
-def paint_score(image, goals1, goals2, field):
+def paint_score(image, goals1, goals2, field, total_time):
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 1
     font_color = (240, 240, 240)
     line_type = 4
-    text = str(goals1) + " x " + str(goals2)
+    minutes = int(total_time)
+    seconds = int((total_time - minutes) * 60)
+    minutes_str = str(minutes).zfill(2)
+    seconds_str = str(seconds).zfill(2)
+    text = str(goals1) + " x " + str(goals2) + " - " + minutes_str + ":" + seconds_str
 
     cv2.putText(image, text, (field.margin, int(field.margin/2)), font, font_scale, font_color, line_type)
 

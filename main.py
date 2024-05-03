@@ -73,6 +73,7 @@ ball = reset_ball()
 goal = 0
 goals1 = 0
 goals2 = 0
+total_time = 0
 
 # start game loop
 while not exit:
@@ -103,7 +104,7 @@ while not exit:
     
     goal = 0
 
-  painter.paint_score(image, goals1, goals2, field)
+  painter.paint_score(image, goals1, goals2, field, total_time)
 
   cv2.imshow('Futebots! Genetic algorithms for football agents.', image)
 
@@ -111,6 +112,7 @@ while not exit:
   end = time.time()
   elapsed_time = end - start
   time.sleep(max(0, target_elapsed_time - elapsed_time))
+  total_time += target_elapsed_time
   start = time.time()
 
   # capture key press
