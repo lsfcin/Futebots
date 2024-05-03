@@ -25,7 +25,7 @@ skin_colors.append((171, 226, 247))
 skin_colors.append((100, 139, 172))
 skin_colors.append((60 , 97 , 148))
 skin_colors.append((77 , 100, 153))
-skin_colors.append((30 , 40 , 63 ))
+skin_colors.append((30 , 40 , 63 )) 
 
 def sort_skin(skin_colors):
     return skin_colors[int(random.random()*len(skin_colors))]

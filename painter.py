@@ -11,6 +11,10 @@ def create_field_image(field):
     width = field.width
     margin = field.margin
     goal_size = field.goal_size
+    postL1 = field.postL1
+    postL2 = field.postL2
+    postR1 = field.postR1
+    postR2 = field.postR2
 
     image = (
         np.ones((height + margin, width + margin, 3), dtype="uint8") * background_grey
@@ -37,6 +41,7 @@ def create_field_image(field):
         2,
     )
 
+    # draw the goal areas
     cv2.rectangle(
         image,
         (int(margin / 2), int((height + margin) / 2) - int(goal_size / 2)),
@@ -52,6 +57,12 @@ def create_field_image(field):
         lines_gray,
         2,
     )
+
+    # draw the goal posts
+    cv2.circle(image, (postL1.x, postL1.y), postL1.radius, (240,240,240), -1)
+    cv2.circle(image, (postL2.x, postL2.y), postL2.radius, (240,240,240), -1)
+    cv2.circle(image, (postR1.x, postR1.y), postR1.radius, (240,240,240), -1)
+    cv2.circle(image, (postR2.x, postR2.y), postR2.radius, (240,240,240), -1)
 
     return image
 
@@ -110,8 +121,8 @@ def paint_head(image, animation_stage, skin_color, hair_color, circle, x, y, for
     cv2.circle(image, (head_x, head_y), int(circle.radius / 2), skin_color, -1)
     
     # hair
-    hair_x = int(head_x - forward[0] * 0.045)
-    hair_y = int(head_y - forward[1] * 0.045)
+    hair_x = int(head_x - forward[0] * 0.047)
+    hair_y = int(head_y - forward[1] * 0.047)
     cv2.ellipse(
         image, 
         (hair_x, hair_y), 
