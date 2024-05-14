@@ -12,15 +12,13 @@ class Circle:
         radius,     # in pixels
         x,          # in pixels
         y,          # in pixels
-        angle,      # in radians
-        ang_speed): # in radians per second
-        
+        angle):     # in radians
+       
     self.radius = radius
     self.x = x
     self.y = y
     self.angle = angle
     self.speed = 0
-    self.ang_speed = ang_speed
 
     self.render_x = self.x
     self.render_y = self.y
@@ -40,13 +38,7 @@ class Circle:
       self.x += vx * elapsed_time
       self.y += vy * elapsed_time
 
-  def update_direction(self, elapsed_time):
-      self.angle += self.ang_speed * elapsed_time
-      if self.angle > 2 * math.pi:
-          self.angle -= 2 * math.pi
-
   def update(self, elapsed_time):
-      self.update_direction(elapsed_time)
       self.update_position(elapsed_time)
 
       pos_factor = 0.6

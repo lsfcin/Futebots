@@ -1,11 +1,32 @@
 import math
 import circle
+from enum import Enum
+
+class Genes(Enum):
+  SIZE = 0
+  ACCEL = 1
+  SPEED = 2
+  ANGLE = 3
+  POSSE = 4
+  KICK = 5
+  TO_BALL = 6
+  TO_GOAL = 7
+  TO_OPP = 8
+  KICK_GOAL = 9
+  KICK_TEAM = 10
 
 class Player:
     animation_stage = 0
     animation_direction = 1
-    hold_count = 0
+    possession_count = 0
     has_ball = False
+		
+		# size (radius)	  1 to 2
+		# accel			      1 to 2
+		# max_speed			  1 to 2
+		# angular_speed   1 to 2
+		# possession_time 1 to 2
+		# kick_strength	  1 to 2
 
     def __init__(
           self, 
@@ -14,17 +35,19 @@ class Player:
           skin, 
           hair, 
           accel, 
-          top_speed,
-          top_hold_count,
-          kick_strength):
+          max_speed,
+          angular_speed, # in radians per second
+          possession,
+          kick_str):
         self.circle = circle
         self.team = team
         self.skin_color = skin
         self.hair_color = hair
         self.accel = accel
-        self.top_speed = top_speed
-        self.top_hold_count = top_hold_count
-        self.kick_strength = kick_strength
+        self.top_speed = max_speed
+        self.angular_speed = angular_speed
+        self.possession = possession
+        self.kick_str = kick_str
 
     def update(self, elapsed_time):
         dir_speed = self.circle.speed
@@ -32,7 +55,6 @@ class Player:
         self.circle.speed = dir_speed
         self.circle.update(elapsed_time)
         
-
     def update_animation_stage(self):
       animation_factor = 0.3
       self.animation_stage = self.animation_stage + animation_factor * (self.circle.speed * self.animation_direction)
@@ -44,14 +66,19 @@ class Player:
           self.animation_direction = 1
 
       # after a kick, skip some frames to enable the player to grab the ball again
-      if(self.hold_count < 0):
-          self.hold_count += 1
+      if(self.possession_count < 0):
+          self.possession_count += 1
+
+    def update_direction(self, elapsed_time):
+      self.circle.angle += self.angular_speed * elapsed_time
+      if self.circle.angle > 2 * math.pi:
+          self.circle.angle -= 2 * math.pi
 
     def get_animation_stage(self):
         return self.animation_stage
     
     def manage_ball(self, ball, collided, players):
-      if(collided and self.hold_count == 0):
+      if(collided and self.possession_count == 0):
           # grab the ball
           self.has_ball = True
 
@@ -64,16 +91,16 @@ class Player:
       if(self.has_ball):
 
         # keep counting possession time
-        self.hold_count += 1
+        self.possession_count += 1
 
-        if(self.hold_count > self.top_hold_count):
+        if(self.possession_count > self.possession):
             # reset possession
-            self.hold_count = -30 # it will take N frames to grab the ball again
+            self.possession_count = -30 # it will take N frames to grab the ball again
             self.has_ball = False
             
             # kick the ball
             ball.angle = self.circle.angle
-            ball.speed = self.kick_strength
+            ball.speed = self.kick_str
 
         else:
             # move the ball with the player

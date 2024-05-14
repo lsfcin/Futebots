@@ -8,6 +8,8 @@ import painter
 import physics
 import numpy as np
 
+print('Futebots! Genetic algorithms for football agents.')
+
 # globals
 start = time.time()
 end = time.time()
@@ -54,12 +56,12 @@ def reset_players():
     start_pos.append(np.array((int(field.margin/2 + field.width * 0.7), int(field.margin/2 + field.height * 0.2))))
     start_pos.append(np.array((int(field.margin/2 + field.width * 0.7), int(field.margin/2 + field.height * 0.8))))
     
-    p1 = player.Player(circle.Circle(100, start_pos[0][0], start_pos[0][1], 1.6, -0.001 ), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50,  50, 60, 350)
-    p2 = player.Player(circle.Circle(35,  start_pos[1][0], start_pos[1][1], 1.9,  0.001 ), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100, 60, 350)
-    p3 = player.Player(circle.Circle(25,  start_pos[2][0], start_pos[2][1], 1.0,  0.0001), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100, 60, 350)
-    p4 = player.Player(circle.Circle(30,  start_pos[3][0], start_pos[3][1], 0.6,  0.002 ), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100, 60, 350)
-    p5 = player.Player(circle.Circle(25,  start_pos[4][0], start_pos[4][1], 0.1, -0.0001), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100, 60, 350)
-    p6 = player.Player(circle.Circle(20,  start_pos[5][0], start_pos[5][1], 2.6,  0.0005), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 150, 60, 350)
+    p1 = player.Player(circle.Circle(100, start_pos[0][0], start_pos[0][1], 0.0), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50,  50, -0.001 , 60, 350)
+    p2 = player.Player(circle.Circle(35,  start_pos[1][0], start_pos[1][1], 0.4), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100,  0.001 , 60, 350)
+    p3 = player.Player(circle.Circle(25,  start_pos[2][0], start_pos[2][1],-0.4), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100,  0.0001, 60, 350)
+    p4 = player.Player(circle.Circle(30,  start_pos[3][0], start_pos[3][1], 3.2), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100,  0.002 , 60, 350)
+    p5 = player.Player(circle.Circle(25,  start_pos[4][0], start_pos[4][1], 2.8), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100, -0.0001, 60, 350)
+    p6 = player.Player(circle.Circle(20,  start_pos[5][0], start_pos[5][1], 3.6), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 150,  0.0005, 60, 350)
     players = [p1, p2, p3, p4, p5, p6]
 
     return players
@@ -67,52 +69,75 @@ def reset_players():
 players = reset_players()
 
 def reset_ball():
-    return circle.Circle(15, int((field.margin + field.width)/2), int((field.margin + field.height)/2), 0, 0)
+    return circle.Circle(15, int((field.margin + field.width)/2), int((field.margin + field.height)/2), 0)
 
 ball = reset_ball()
-goal = 0
+scored = 0
 goals1 = 0
 goals2 = 0
 total_time = 0
+freeze_time = 0
 
-# start game loop
+def simulate_physics(target_elapsed_time, field, players, ball):
+    for p in players:
+      physics.move_player(p, field, players, target_elapsed_time)
+
+    goal = physics.move_ball(ball, field, players, target_elapsed_time)
+    return goal
+
+def paint(players, ball, image):
+    painter.paint_ball(image, ball)
+    for p in players:
+      painter.paint_player(image, p)
+    painter.paint_score(image, goals1, goals2, field, total_time)
+    cv2.imshow('Futebots! Genetic algorithms for football agents.', image)
+
+def update_score(scored, goals1, goals2):
+    if(scored != 0):
+      # if a goal was scored, reset the ball and the players
+      players = reset_players()
+      ball = reset_ball()
+
+      if scored == 1:
+        goals1 += 1
+      elif scored == -1:
+        goals2 += 1
+    
+      scored = 0
+
+    return goals1, goals2
+
+# start game loop    
 while not exit:
 
   # create the image from the field
   image = painter.create_field_image(field)
-  
-  #simulate the game components
-  for p in players:
-    physics.move_player(p, field, players, target_elapsed_time)
 
-  goal = physics.move_ball(ball, field, players, target_elapsed_time)
-  
-  # paint the game components
-  painter.paint_ball(image, ball)
-  for p in players:
-    painter.paint_player(image, p)
-
-  if(goal != 0):
-    # if a goal was scored, reset the ball and the players
+  if freeze_time == 0:
     players = reset_players()
     ball = reset_ball()
 
-    if goal == 1:
-      goals1 += 1
-    elif goal == -1:
-      goals2 += 1
+  if freeze_time >= 1:
     
-    goal = 0
+    #simulate the game components
+    scored = simulate_physics(target_elapsed_time, field, players, ball)
+    goals1, goals2 = update_score(scored, goals1, goals2)
 
-  painter.paint_score(image, goals1, goals2, field, total_time)
+    # paint the game components
+    paint(players, ball, image)
 
-  cv2.imshow('Futebots! Genetic algorithms for football agents.', image)
+  freeze_time += 1
+
+  if scored != 0:
+    scored = 0
+    freeze_time = -60
 
   # time management
   end = time.time()
   elapsed_time = end - start
   time.sleep(max(0, target_elapsed_time - elapsed_time))
-  total_time += target_elapsed_time
+  if freeze_time >= 1:
+    total_time += target_elapsed_time
   start = time.time()
 
   # capture key press
