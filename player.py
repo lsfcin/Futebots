@@ -1,19 +1,5 @@
 import math
 import circle
-from enum import Enum
-
-class Genes(Enum):
-  SIZE = 0
-  ACCEL = 1
-  SPEED = 2
-  ANGLE = 3
-  POSSE = 4
-  KICK = 5
-  TO_BALL = 6
-  TO_GOAL = 7
-  TO_OPP = 8
-  KICK_GOAL = 9
-  KICK_TEAM = 10
 
 class Player:
     animation_stage = 0
@@ -28,7 +14,7 @@ class Player:
 		# possession_time 1 to 2
 		# kick_strength	  1 to 2
 
-    def __init__(
+    def __init__( 
           self, 
           circle, 
           team, 
