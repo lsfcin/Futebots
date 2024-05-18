@@ -9,10 +9,11 @@ class Circle:
   
   def __init__(
         self, 
-        radius,     # in pixels
+        angle,      # in radians
         x,          # in pixels
         y,          # in pixels
-        angle):     # in radians
+        radius = 20,# in pixels
+        ):
        
     self.radius = radius
     self.x = x
@@ -23,7 +24,7 @@ class Circle:
     self.render_x = self.x
     self.render_y = self.y
     self.render_direction = self.angle
-      
+    
   def get_velocity_vector(self):
       vx = self.speed * math.cos(self.angle)
       vy = self.speed * math.sin(self.angle)

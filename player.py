@@ -1,5 +1,6 @@
 import math
 import circle
+import genetics
 
 class Player:
     animation_stage = 0
@@ -7,37 +8,34 @@ class Player:
     possession_count = 0
     has_ball = False
 		
-		# size (radius)	  1 to 2
-		# accel			      1 to 2
-		# max_speed			  1 to 2
-		# angular_speed   1 to 2
-		# possession_time 1 to 2
-		# kick_strength	  1 to 2
-
     def __init__( 
-          self, 
-          circle, 
-          team, 
+          self,
+          circle,
           skin, 
           hair, 
-          accel, 
-          max_speed,
-          angular_speed, # in radians per second
-          possession,
-          kick_str):
+          team, 
+          genes):
+        self.skin_color       = skin
+        self.hair_color       = hair
+        self.team             = team
+        self.acceleration     = genes.get_acceleration()
+        self.size             = genes.get_size()
+        self.kick_strength    = genes.get_kick_strength()
+        self.possession_time  = genes.get_possession_time()
+        self.move_to_goal     = genes.get_move_to_goal()
+        self.move_to_ball     = genes.get_move_to_ball()
+        self.prefer_pass      = genes.get_prefer_pass()
+        self.prefer_shoot     = genes.get_prefer_shoot()
+        
         self.circle = circle
-        self.team = team
-        self.skin_color = skin
-        self.hair_color = hair
-        self.accel = accel
-        self.top_speed = max_speed
-        self.angular_speed = angular_speed
-        self.possession = possession
-        self.kick_str = kick_str
+        self.circle.radius = self.size
+
+        self.max_speed = 100
+        self.angular_speed = 0.1
 
     def update(self, elapsed_time):
         dir_speed = self.circle.speed
-        dir_speed = min(self.top_speed, dir_speed + self.accel * elapsed_time)
+        dir_speed = min(self.max_speed, dir_speed + self.acceleration * elapsed_time)
         self.circle.speed = dir_speed
         self.circle.update(elapsed_time)
         
@@ -79,14 +77,14 @@ class Player:
         # keep counting possession time
         self.possession_count += 1
 
-        if(self.possession_count > self.possession):
+        if(self.possession_count > self.possession_time):
             # reset possession
             self.possession_count = -30 # it will take N frames to grab the ball again
             self.has_ball = False
             
             # kick the ball
             ball.angle = self.circle.angle
-            ball.speed = self.kick_str
+            ball.speed = self.kick_strength
 
         else:
             # move the ball with the player

@@ -6,6 +6,7 @@ import circle
 import player
 import painter
 import physics
+import genetics
 import numpy as np
 
 print('Futebots! Genetic algorithms for football agents.')
@@ -23,45 +24,61 @@ field = map.Map(1000, 700, 100, 250)
 
 # skin colors in RGB from consult to 
 # https://static.vecteezy.com/system/resources/previews/006/683/568/non_2x/skin-tones-palette-by-color-codes-different-types-human-skin-flat-icon-set-vector.jpg
-skin_colors = list()
-skin_colors.append((196, 223, 255))
-skin_colors.append((168, 203, 234))
-skin_colors.append((171, 226, 247))
-skin_colors.append((100, 139, 172))
-skin_colors.append((60 , 97 , 148))
-skin_colors.append((77 , 100, 153))
-skin_colors.append((30 , 40 , 63 )) 
-
-def sort_skin(skin_colors):
+def rand_skin():
+    skin_colors = list()
+    skin_colors.append((196, 223, 255))
+    skin_colors.append((168, 203, 234))
+    skin_colors.append((171, 226, 247))
+    skin_colors.append((100, 139, 172))
+    skin_colors.append((60 , 97 , 148))
+    skin_colors.append((77 , 100, 153))
+    skin_colors.append((30 , 40 , 63 )) 
     return skin_colors[int(random.random()*len(skin_colors))]
 
 # hair colors in RGB
-hair_colors = list()
-hair_colors.append((30, 40, 45))
-hair_colors.append((60, 75, 80))
-hair_colors.append((80, 75, 60))
-hair_colors.append((10, 40, 50))
-hair_colors.append((5 , 10, 15))
+def rand_hair():
+    hair_colors = list()
+    hair_colors.append((30, 40, 45))
+    hair_colors.append((60, 75, 80))
+    hair_colors.append((80, 75, 60))
+    hair_colors.append((10, 40, 50))
+    hair_colors.append((5 , 10, 15))
+    return hair_colors[int(random.random()*len(hair_colors))]
 
-def sort_hair(hair_colors):
-    return hair_colors[int(random.random()*len(hair_colors))]	
+# genes
+def rand_genes():
+    genes_list = list()
+    genes_list.append(random.random()*2-1)
+    genes_list.append(random.random()*2-1)
+    genes_list.append(random.random()*2-1)
+    genes_list.append(random.random()*2-1)
+    genes = genetics.Genes(genes_list)
+    return genes
+
+# circle, skin, hair, team, genes
+# angle, x, y
+
+# SIZE_X_ACCELERATION = 0  # -1 = max size, 1 = max acceleration
+# KICK_X_POSSESSION = 1    # -1 = max kick strength, 1 = max possession time
+# BALL_X_OWN_GOAL = 2      # -1 = moves always towards ball, 1 = moves always towards own goal
+# PASS_X_SHOOT = 3         # -1 = always passes, 1 = always shoots
 
 # define starting positions for the players
 def reset_players():
-    start_pos = list()
-    start_pos.append(np.array((int(field.margin/2 + field.width * 0.2), int(field.margin/2 + field.height * 0.5))))
-    start_pos.append(np.array((int(field.margin/2 + field.width * 0.3), int(field.margin/2 + field.height * 0.2))))
-    start_pos.append(np.array((int(field.margin/2 + field.width * 0.3), int(field.margin/2 + field.height * 0.8))))
-    start_pos.append(np.array((int(field.margin/2 + field.width * 0.8), int(field.margin/2 + field.height * 0.5))))
-    start_pos.append(np.array((int(field.margin/2 + field.width * 0.7), int(field.margin/2 + field.height * 0.2))))
-    start_pos.append(np.array((int(field.margin/2 + field.width * 0.7), int(field.margin/2 + field.height * 0.8))))
+    pos = list()
+    pos.append(np.array((int(field.margin/2 + field.width * 0.2), int(field.margin/2 + field.height * 0.5))))
+    pos.append(np.array((int(field.margin/2 + field.width * 0.3), int(field.margin/2 + field.height * 0.2))))
+    pos.append(np.array((int(field.margin/2 + field.width * 0.3), int(field.margin/2 + field.height * 0.8))))
+    pos.append(np.array((int(field.margin/2 + field.width * 0.8), int(field.margin/2 + field.height * 0.5))))
+    pos.append(np.array((int(field.margin/2 + field.width * 0.7), int(field.margin/2 + field.height * 0.2))))
+    pos.append(np.array((int(field.margin/2 + field.width * 0.7), int(field.margin/2 + field.height * 0.8))))
     
-    p1 = player.Player(circle.Circle(100, start_pos[0][0], start_pos[0][1], 0.0), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50,  50, -0.001 , 60, 350)
-    p2 = player.Player(circle.Circle(35,  start_pos[1][0], start_pos[1][1], 0.4), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100,  0.001 , 60, 350)
-    p3 = player.Player(circle.Circle(25,  start_pos[2][0], start_pos[2][1],-0.4), 1, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100,  0.0001, 60, 350)
-    p4 = player.Player(circle.Circle(30,  start_pos[3][0], start_pos[3][1], 3.2), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100,  0.002 , 60, 350)
-    p5 = player.Player(circle.Circle(25,  start_pos[4][0], start_pos[4][1], 2.8), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 100, -0.0001, 60, 350)
-    p6 = player.Player(circle.Circle(20,  start_pos[5][0], start_pos[5][1], 3.6), 2, sort_skin(skin_colors), sort_hair(hair_colors), 50, 150,  0.0005, 60, 350)
+    p1 = player.Player(circle.Circle( 0.0, pos[0][0], pos[0][1]), rand_skin(), rand_hair(), 1, rand_genes())
+    p2 = player.Player(circle.Circle( 0.4, pos[1][0], pos[1][1]), rand_skin(), rand_hair(), 1, rand_genes())
+    p3 = player.Player(circle.Circle(-0.4, pos[2][0], pos[2][1]), rand_skin(), rand_hair(), 1, rand_genes())
+    p4 = player.Player(circle.Circle( 3.2, pos[3][0], pos[3][1]), rand_skin(), rand_hair(), 2, rand_genes())
+    p5 = player.Player(circle.Circle( 2.8, pos[4][0], pos[4][1]), rand_skin(), rand_hair(), 2, rand_genes())
+    p6 = player.Player(circle.Circle( 3.6, pos[5][0], pos[5][1]), rand_skin(), rand_hair(), 2, rand_genes())
     players = [p1, p2, p3, p4, p5, p6]
 
     return players
@@ -69,7 +86,7 @@ def reset_players():
 players = reset_players()
 
 def reset_ball():
-    return circle.Circle(15, int((field.margin + field.width)/2), int((field.margin + field.height)/2), 0)
+    return circle.Circle(0, int((field.margin + field.width)/2), int((field.margin + field.height)/2), 15)
 
 ball = reset_ball()
 scored = 0
